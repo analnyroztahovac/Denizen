@@ -2,10 +2,13 @@ package com.denizenscript.denizen.scripts.commands.entity;
 
 import com.denizenscript.denizen.objects.EntityTag;
 import com.denizenscript.denizen.objects.properties.entity.EntityAge;
+import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.core.ElementTag;
+import com.denizenscript.denizencore.objects.core.ListTag;
 import com.denizenscript.denizencore.scripts.ScriptEntry;
 import com.denizenscript.denizencore.scripts.commands.AbstractCommand;
 import com.denizenscript.denizencore.scripts.commands.generator.*;
+import com.denizenscript.denizencore.utilities.Deprecations;
 import com.denizenscript.denizencore.utilities.debugging.Debug;
 import org.bukkit.entity.Breedable;
 
@@ -59,20 +62,28 @@ public class AgeCommand extends AbstractCommand {
     private enum AgeType { ADULT, BABY }
 
     public static void autoExecute(ScriptEntry scriptEntry,
-                                   @ArgName("entities") @ArgLinear @ArgDefaultNull @ArgSubType(EntityTag.class) List<EntityTag> entities,
-                                   @ArgName("age") @ArgLinear @ArgDefaultText("1") ElementTag age,
+                                   @ArgName("entities") @ArgLinear ObjectTag entities,
+                                   @ArgName("age") @ArgLinear @ArgDefaultText("1") ObjectTag age,
                                    @ArgName("lock") boolean shouldLock) {
+        if (age instanceof ListTag || age instanceof EntityTag) { // Compensate for legacy age/entity out-of-order support
+            Deprecations.outOfOrderArgs.warn(scriptEntry);
+            ObjectTag swap = entities;
+            entities = age;
+            age = swap;
+        }
         int ageInt = 1;
-        if (age.matchesEnum(AgeType.class)) {
-            switch (age.asEnum(AgeType.class)) {
+        ElementTag ageElement = age.asElement();
+        if (ageElement.matchesEnum(AgeType.class)) {
+            switch (ageElement.asEnum(AgeType.class)) {
                 case BABY -> ageInt = -24000;
                 case ADULT -> ageInt = 0;
             }
         }
-        else if (age.isInt()) {
-            ageInt = age.asInt();
+        else if (ageElement.isInt()) {
+            ageInt = ageElement.asInt();
         }
-        for (EntityTag entity : entities) {
+        List<EntityTag> entitiesList = entities.asType(ListTag.class, scriptEntry.context).filter(EntityTag.class, scriptEntry);
+        for (EntityTag entity : entitiesList) {
             if (entity.isSpawned()) {
                 if (EntityAge.describes(entity)) {
                     EntityAge property = new EntityAge(entity);
