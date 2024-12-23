@@ -65,7 +65,7 @@ public class AgeCommand extends AbstractCommand {
                                    @ArgName("entities") @ArgLinear ObjectTag entities,
                                    @ArgName("age") @ArgLinear @ArgDefaultText("1") ObjectTag age,
                                    @ArgName("lock") boolean shouldLock) {
-        if (age instanceof ListTag || age instanceof EntityTag) { // Compensate for legacy age/entity out-of-order support
+        if (!age.asElement().isInt() && !age.asElement().matchesEnum(AgeType.class)) { // Compensate for legacy age/entity out-of-order support
             Deprecations.outOfOrderArgs.warn(scriptEntry);
             ObjectTag swap = entities;
             entities = age;
