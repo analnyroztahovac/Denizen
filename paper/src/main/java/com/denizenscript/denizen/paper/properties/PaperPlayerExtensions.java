@@ -79,6 +79,19 @@ public class PaperPlayerExtensions {
             return map;
         });
 
+        // <--[tag]
+        // @attribute <PlayerTag.view_distance>
+        // @returns ElementTag(Number)
+        // @mechanism PlayerTag.view_distance
+        // @group paper
+        // @Plugin Paper
+        // @description
+        // Returns this player's view distance.
+        // -->
+        PlayerTag.registerOnlineOnlyTag(ElementTag.class, "view_distance", (attribute, object) -> {
+            return new ElementTag(object.getPlayerEntity().getViewDistance());
+        });
+
         // <--[mechanism]
         // @object PlayerTag
         // @name affects_monster_spawning
@@ -133,6 +146,29 @@ public class PaperPlayerExtensions {
         PlayerTag.registerOnlineOnlyMechanism("fake_op_level", ElementTag.class, (object, mechanism, input) -> {
             if (mechanism.requireInteger()) {
                 object.getPlayerEntity().sendOpLevel((byte) input.asInt());
+            }
+        });
+
+        // <--[mechanism]
+        // @object PlayerTag
+        // @name view_distance
+        // @input ElementTag(Number)
+        // @Plugin Paper
+        // @group paper
+        // @description
+        // Sets this player's view distance. Input must be a number between 2 and 32.
+        // This will be reset when a player rejoins.
+        // @tags
+        // <PlayerTag.view_distance>
+        // -->
+        PlayerTag.registerOnlineOnlyMechanism("view_distance", ElementTag.class, (object, mechanism, input) -> {
+            if (mechanism.requireInteger()) {
+                int distance = input.asInt();
+                if (distance < 2 || distance > 32) {
+                    mechanism.echoError("Invalid view distance '" + input + "': must be between 2 and 32.");
+                    return;
+                }
+                object.getPlayerEntity().setViewDistance(distance);
             }
         });
 
