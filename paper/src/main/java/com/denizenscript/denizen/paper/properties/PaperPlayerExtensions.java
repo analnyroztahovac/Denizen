@@ -157,18 +157,18 @@ public class PaperPlayerExtensions {
         // @group paper
         // @description
         // Sets this player's view distance. Input must be a number between 2 and 32.
-        // This will be reset when a player rejoins. Provide empty input to unset.
+        // This will be reset when a player rejoins. Provide no input to unset.
         // @tags
         // <PlayerTag.view_distance>
         // -->
-        PlayerTag.registerOnlineOnlyMechanism("view_distance", ElementTag.class, (object, mechanism, input) -> {
+        PlayerTag.registerOnlineOnlyMechanism("view_distance", (object, mechanism) -> {
             if (!mechanism.hasValue()) {
                 object.getPlayerEntity().setViewDistance(-1);
             }
             else if (mechanism.requireInteger()) {
-                int distance = input.asInt();
+                int distance = mechanism.getValue().asInt();
                 if (distance < 2 || distance > 32) {
-                    mechanism.echoError("Invalid view distance '" + input + "': must be between 2 and 32.");
+                    mechanism.echoError("Invalid view distance '" + distance + "': must be between 2 and 32.");
                     return;
                 }
                 object.getPlayerEntity().setViewDistance(distance);
