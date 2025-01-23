@@ -446,6 +446,9 @@ public class BukkitImplDeprecations {
     // Added 2025/01/12
     public static Warning arrowBasePotionType = new FutureWarning("arrowBasePotionType", "Using 'EntityTag.potion' to get an arrow's base potion type is deprecated in favor of 'EntityTag.potion_type'.");
 
+    // Added 2025/01/04
+    public static Warning playEffectSpecialDataListInput = new FutureWarning("playEffectSpecialDataListInput", "List input for the special_data argument in playeffect command is now deprecated. Please use a MapTag instead.");
+
     // ==================== PAST deprecations of things that are already gone but still have a warning left behind ====================
 
     // Removed upstream 2023/10/29 without warning.
